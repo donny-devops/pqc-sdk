@@ -1,0 +1,88 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.backends.legacy:build"
+
+[project]
+name = "pqc-sdk"
+version = "0.1.0"
+description = "Post-Quantum Cryptography SDK — ML-KEM, ML-DSA, SLH-DSA (FIPS 203/204/205)"
+readme = "README.md"
+license = { file = "LICENSE" }
+authors = [{ name = "Adonis Jimenez", email = "adonis@postquantumstudio.com" }]
+maintainers = [{ name = "Adonis Jimenez", email = "adonis@postquantumstudio.com" }]
+keywords = [
+    "post-quantum", "cryptography", "ML-KEM", "ML-DSA", "Kyber", "Dilithium",
+    "FIPS-203", "FIPS-204", "FIPS-205", "SLH-DSA", "lattice", "pqc", "quantum-safe"
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Information Technology",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Security :: Cryptography",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Typing :: Typed",
+]
+requires-python = ">=3.10"
+dependencies = [
+    "cryptography>=42.0.0",
+]
+
+[project.optional-dependencies]
+native = [
+    "liboqs-python>=0.10.0",  # enables liboqs backend (recommended for production)
+]
+dev = [
+    "pytest>=8.0",
+    "pytest-benchmark>=4.0",
+    "ruff>=0.4",
+    "black>=24.0",
+    "mypy>=1.10",
+]
+docs = [
+    "mkdocs>=1.6",
+    "mkdocs-material>=9.5",
+    "mkdocstrings[python]>=0.25",
+]
+
+[project.urls]
+Homepage = "https://postquantumstudio.com"
+Documentation = "https://postquantumstudio.com/docs/pqc-sdk"
+Repository = "https://github.com/donny-devops/post-quantum-studio"
+Issues = "https://github.com/donny-devops/post-quantum-studio/issues"
+Changelog = "https://github.com/donny-devops/post-quantum-studio/blob/main/CHANGELOG.md"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+pqc_sdk = ["py.typed"]
+
+[tool.ruff]
+target-version = "py310"
+line-length = 100
+select = ["E", "F", "I", "UP", "B", "SIM"]
+ignore = ["E501"]
+
+[tool.ruff.isort]
+known-first-party = ["pqc_sdk"]
+
+[tool.black]
+line-length = 100
+target-version = ["py310", "py311", "py312"]
+
+[tool.mypy]
+python_version = "3.10"
+strict = true
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-v --tb=short"
+
+[tool.pytest-benchmark]
+min_rounds = 10
