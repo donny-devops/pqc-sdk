@@ -12,11 +12,8 @@ Supported algorithms:
 """
 
 from __future__ import annotations
-import os
-import struct
-import hashlib
-from typing import Tuple
-from pqc_sdk._backend import get_backend, BackendType
+
+from pqc_sdk._backend import get_backend
 from pqc_sdk.exceptions import AlgorithmNotSupportedError, PQCError
 
 # Algorithm name normalization map
@@ -86,7 +83,7 @@ class KEM:
     # Public API                                                           #
     # ------------------------------------------------------------------ #
 
-    def keygen(self) -> Tuple[bytes, bytes]:
+    def keygen(self) -> tuple[bytes, bytes]:
         """
         Generate a KEM key pair.
 
@@ -96,7 +93,7 @@ class KEM:
         """
         return self._kem.keygen()
 
-    def encapsulate(self, public_key: bytes) -> Tuple[bytes, bytes]:
+    def encapsulate(self, public_key: bytes) -> tuple[bytes, bytes]:
         """
         Encapsulate: generate a shared secret and ciphertext.
 

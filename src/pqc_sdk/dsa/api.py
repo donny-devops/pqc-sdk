@@ -13,9 +13,9 @@ Supported algorithms:
 """
 
 from __future__ import annotations
-from typing import Tuple
+
 from pqc_sdk._backend import get_backend
-from pqc_sdk.exceptions import AlgorithmNotSupportedError, PQCError, SignatureVerificationError
+from pqc_sdk.exceptions import AlgorithmNotSupportedError, SignatureVerificationError
 
 _ALIASES: dict[str, str] = {
     "ML-DSA-44": "ML-DSA-44",
@@ -100,7 +100,7 @@ class DSA:
     # Public API                                                           #
     # ------------------------------------------------------------------ #
 
-    def keygen(self) -> Tuple[bytes, bytes]:
+    def keygen(self) -> tuple[bytes, bytes]:
         """
         Generate a DSA key pair.
 

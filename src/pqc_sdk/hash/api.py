@@ -8,9 +8,9 @@ SHA-3 variants are generally preferred in new PQC deployments.
 """
 
 from __future__ import annotations
+
 import hashlib
 from enum import Enum
-from typing import Optional
 
 
 class HashAlgorithm(Enum):
@@ -37,7 +37,7 @@ _DEFAULT_OUTPUT_SIZES = {
 def hash_message(
     message: bytes,
     algorithm: HashAlgorithm = HashAlgorithm.SHAKE_256,
-    output_size: Optional[int] = None,
+    output_size: int | None = None,
 ) -> bytes:
     """
     Hash a message using a FIPS-approved algorithm.

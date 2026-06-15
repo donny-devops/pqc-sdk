@@ -18,11 +18,11 @@ Quick start:
     assert dsa.verify(pk, b"hello pqc world", sig)
 """
 
-from pqc_sdk.kem.api import KEM
-from pqc_sdk.dsa.api import DSA
-from pqc_sdk.hash.api import hash_message, HashAlgorithm
-from pqc_sdk.utils.hybrid import HybridKEM
 from pqc_sdk._version import __version__
+from pqc_sdk.dsa.api import DSA
+from pqc_sdk.hash.api import HashAlgorithm, hash_message
+from pqc_sdk.kem.api import KEM
+from pqc_sdk.utils.hybrid import HybridKEM
 
 __all__ = [
     "KEM",

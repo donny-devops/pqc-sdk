@@ -1,5 +1,4 @@
 # Patch get_backend to skip liboqs detection in sandbox
-import sys
 import pqc_sdk._backend as _b
 
 _orig = _b.get_backend

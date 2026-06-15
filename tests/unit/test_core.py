@@ -3,19 +3,19 @@ pqc-sdk unit tests
 pytest tests/unit/test_core.py
 """
 
-import pytest
+import os
 import sys
 from pathlib import Path
 
+import pytest
+
 sys.path.insert(0, str(Path(__file__).parent.parent.parent / "src"))
 
-from pqc_sdk import KEM, DSA, HybridKEM, hash_message, HashAlgorithm
+from pqc_sdk import DSA, KEM, HashAlgorithm, HybridKEM, hash_message
 from pqc_sdk.exceptions import (
     AlgorithmNotSupportedError,
-    SignatureVerificationError,
     PQCError,
 )
-
 
 # ─────────────────────────────────────────────
 # KEM Tests
@@ -219,4 +219,3 @@ class TestHash:
         assert len(digest) == 32  # SHAKE_256 default output
 
 
-import os

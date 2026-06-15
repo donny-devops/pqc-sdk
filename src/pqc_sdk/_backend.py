@@ -15,13 +15,11 @@ In production, always install liboqs:
 """
 
 from __future__ import annotations
+
 import hashlib
 import hmac
 import os
-import struct
 from enum import Enum
-from functools import lru_cache
-from typing import Tuple
 
 
 class BackendType(Enum):
@@ -38,12 +36,12 @@ class _LibOQSKEM:
         import oqs as _oqs
         self._kem = _oqs.KeyEncapsulation(oqs_name)
 
-    def keygen(self) -> Tuple[bytes, bytes]:
+    def keygen(self) -> tuple[bytes, bytes]:
         pk = self._kem.generate_keypair()
         sk = self._kem.export_secret_key()
         return pk, sk
 
-    def encapsulate(self, public_key: bytes) -> Tuple[bytes, bytes]:
+    def encapsulate(self, public_key: bytes) -> tuple[bytes, bytes]:
         ct, ss = self._kem.encap_secret(public_key)
         return ct, ss
 
@@ -56,7 +54,7 @@ class _LibOQSDSA:
         import oqs as _oqs
         self._sig = _oqs.Signature(oqs_name)
 
-    def keygen(self) -> Tuple[bytes, bytes]:
+    def keygen(self) -> tuple[bytes, bytes]:
         pk = self._sig.generate_keypair()
         sk = self._sig.export_secret_key()
         return pk, sk
@@ -98,7 +96,7 @@ class _SimKEM:
         self._ss_size = params["ss_size"]
         self._name = params["oqs_name"]
 
-    def keygen(self) -> Tuple[bytes, bytes]:
+    def keygen(self) -> tuple[bytes, bytes]:
         seed = os.urandom(64)
         pk = hashlib.shake_256(b"pk" + seed).digest(self._pk_size)
         # Build sk: seed (64B) + pk_digest (32B) + shake pad to exact sk_size
@@ -110,7 +108,7 @@ class _SimKEM:
             sk = sk_core[:self._sk_size]
         return pk, sk
 
-    def encapsulate(self, public_key: bytes) -> Tuple[bytes, bytes]:
+    def encapsulate(self, public_key: bytes) -> tuple[bytes, bytes]:
         r = os.urandom(32)
         shared_secret = hashlib.shake_256(b"ss" + r + public_key).digest(self._ss_size)
         # Ciphertext encodes r so decap can recover ss
@@ -122,7 +120,7 @@ class _SimKEM:
         r = ciphertext[:32]
         # Recover public key from secret key (first 32 bytes are seed,
         # next 32 are pk[:32] embedded at keygen)
-        pk_fragment = secret_key[32:64]
+        secret_key[32:64]
         # Reconstruct shared secret using the same derivation
         # Real ML-KEM uses the full pk; we approximate with the fragment
         full_pk_approx = hashlib.shake_256(b"pk" + secret_key[:64]).digest(
@@ -145,7 +143,7 @@ class _SimDSA:
         self._sk_size = params["sk_size"]
         self._sig_size = params["sig_size"]
 
-    def keygen(self) -> Tuple[bytes, bytes]:
+    def keygen(self) -> tuple[bytes, bytes]:
         seed = os.urandom(32)
         sk = hashlib.shake_256(b"sk" + seed).digest(self._sk_size)
         pk = hashlib.shake_256(b"pk" + sk[:32]).digest(self._pk_size)
@@ -189,7 +187,7 @@ class SimulationBackend:
             SimulationBackend._WARNING_SHOWN = True
 
     def create_kem(self, oqs_name: str) -> _SimKEM:
-        from pqc_sdk.kem.api import _PARAMS, _ALIASES
+        from pqc_sdk.kem.api import _PARAMS
         # Find params by oqs_name
         params = next(
             (p for p in _PARAMS.values() if p["oqs_name"] == oqs_name),

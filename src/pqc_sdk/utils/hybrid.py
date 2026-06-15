@@ -16,19 +16,18 @@ Shared secret derivation:
 """
 
 from __future__ import annotations
-import hashlib
-import os
-from typing import Tuple
 
-from cryptography.hazmat.primitives.asymmetric.x25519 import X25519PrivateKey, X25519PublicKey
-from cryptography.hazmat.primitives.serialization import (
-    Encoding, PublicFormat, PrivateFormat, NoEncryption
-)
-from cryptography.hazmat.primitives.kdf.hkdf import HKDF
 from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.primitives.asymmetric.x25519 import X25519PrivateKey, X25519PublicKey
+from cryptography.hazmat.primitives.kdf.hkdf import HKDF
+from cryptography.hazmat.primitives.serialization import (
+    Encoding,
+    NoEncryption,
+    PrivateFormat,
+    PublicFormat,
+)
 
 from pqc_sdk.kem.api import KEM
-
 
 _HKDF_INFO = b"pqc-sdk-hybrid-v1"
 _SHARED_SECRET_SIZE = 32
@@ -53,7 +52,7 @@ class HybridKEM:
         self._pq = KEM(pq_algorithm)
         self.algorithm = f"X25519+{pq_algorithm}"
 
-    def keygen(self) -> Tuple[bytes, bytes]:
+    def keygen(self) -> tuple[bytes, bytes]:
         """
         Generate a hybrid key pair.
 
@@ -75,7 +74,7 @@ class HybridKEM:
         secret_key = x_priv_bytes + pq_sec      # 32 + sk_size
         return public_key, secret_key
 
-    def encapsulate(self, public_key: bytes) -> Tuple[bytes, bytes]:
+    def encapsulate(self, public_key: bytes) -> tuple[bytes, bytes]:
         """
         Encapsulate against a hybrid public key.
 
