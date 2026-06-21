@@ -40,6 +40,8 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
           cache: pip
+      - name: Upgrade pip and build tools
+        run: pip install --upgrade pip setuptools wheel
       - name: Install dependencies
         run: |
           pip install -e ".[dev]"
