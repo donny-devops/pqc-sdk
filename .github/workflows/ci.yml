@@ -64,7 +64,9 @@ jobs:
       - name: Install cmake + liboqs build deps
         run: sudo apt-get install -y cmake ninja-build libssl-dev
       - name: Install pqc-sdk with native backend
-        run: pip install -e ".[dev,native]"
+        run: |
+          pip install --upgrade pip setuptools wheel
+          pip install -e ".[dev,native]"
       - name: Run tests (native liboqs)
         run: python -m pytest tests/ -v --tb=short
         env:
