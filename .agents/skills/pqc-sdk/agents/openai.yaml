@@ -1,0 +1,6 @@
+interface:
+  display_name: "Pqc Sdk"
+  short_description: "Repo-specific patterns and workflows for pqc-sdk"
+  default_prompt: "Use the pqc-sdk repo skill to follow existing architecture, testing, and workflow conventions."
+policy:
+  allow_implicit_invocation: true
