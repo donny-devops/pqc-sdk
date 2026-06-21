@@ -14,13 +14,13 @@ from enum import Enum
 
 
 class HashAlgorithm(Enum):
-    SHA3_256 = "sha3_256"      # 256-bit, FIPS 202
-    SHA3_384 = "sha3_384"      # 384-bit, FIPS 202
-    SHA3_512 = "sha3_512"      # 512-bit, FIPS 202
-    SHAKE_128 = "shake_128"    # XOF, variable output, FIPS 202
-    SHAKE_256 = "shake_256"    # XOF, variable output, FIPS 202 ← preferred for PQC
-    SHA2_256 = "sha256"        # Legacy compat, FIPS 180-4
-    SHA2_512 = "sha512"        # Legacy compat, FIPS 180-4
+    SHA3_256 = "sha3_256"  # 256-bit, FIPS 202
+    SHA3_384 = "sha3_384"  # 384-bit, FIPS 202
+    SHA3_512 = "sha3_512"  # 512-bit, FIPS 202
+    SHAKE_128 = "shake_128"  # XOF, variable output, FIPS 202
+    SHAKE_256 = "shake_256"  # XOF, variable output, FIPS 202 ← preferred for PQC
+    SHA2_256 = "sha256"  # Legacy compat, FIPS 180-4
+    SHA2_512 = "sha512"  # Legacy compat, FIPS 180-4
 
 
 _DEFAULT_OUTPUT_SIZES = {
