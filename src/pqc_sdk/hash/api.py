@@ -64,7 +64,7 @@ def hash_message(
 
     if algorithm == HashAlgorithm.SHAKE_128:
         return hashlib.shake_128(message).digest(size)
-    if algorithm == HashAlgorithm.SHAKE_256:
+    elif algorithm == HashAlgorithm.SHAKE_256:
         return hashlib.shake_256(message).digest(size)
 
     h = hashlib.new(algorithm.value)

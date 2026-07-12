@@ -20,7 +20,7 @@ import hashlib
 import hmac
 import os
 from enum import Enum
-from typing import Any, TypedDict, cast
+from typing import Protocol, TypedDict, cast
 
 
 class BackendType(Enum):
@@ -46,6 +46,20 @@ class DSAParams(TypedDict):
     fips: str
 
 
+class _OQSKEMImpl(Protocol):
+    def generate_keypair(self) -> bytes: ...
+    def export_secret_key(self) -> bytes: ...
+    def encap_secret(self, public_key: bytes) -> tuple[bytes, bytes]: ...
+    def decap_secret(self, ciphertext: bytes) -> bytes: ...
+
+
+class _OQSSignatureImpl(Protocol):
+    def generate_keypair(self) -> bytes: ...
+    def export_secret_key(self) -> bytes: ...
+    def sign(self, message: bytes) -> bytes: ...
+    def verify(self, message: bytes, signature: bytes, public_key: bytes) -> bool: ...
+
+
 # ------------------------------------------------------------------ #
 # liboqs backend                                                       #
 # ------------------------------------------------------------------ #
@@ -55,37 +69,37 @@ class _LibOQSKEM:
     def __init__(self, oqs_name: str) -> None:
         import oqs as _oqs
 
-        self._kem: Any = _oqs.KeyEncapsulation(oqs_name)
+        self._kem = cast(_OQSKEMImpl, _oqs.KeyEncapsulation(oqs_name))
 
     def keygen(self) -> tuple[bytes, bytes]:
-        pk = cast(bytes, self._kem.generate_keypair())
-        sk = cast(bytes, self._kem.export_secret_key())
+        pk = self._kem.generate_keypair()
+        sk = self._kem.export_secret_key()
         return pk, sk
 
     def encapsulate(self, public_key: bytes) -> tuple[bytes, bytes]:
-        ct, ss = cast(tuple[bytes, bytes], self._kem.encap_secret(public_key))
+        ct, ss = self._kem.encap_secret(public_key)
         return ct, ss
 
     def decapsulate(self, secret_key: bytes, ciphertext: bytes) -> bytes:
-        return cast(bytes, self._kem.decap_secret(ciphertext))
+        return self._kem.decap_secret(ciphertext)
 
 
 class _LibOQSDSA:
     def __init__(self, oqs_name: str) -> None:
         import oqs as _oqs
 
-        self._sig: Any = _oqs.Signature(oqs_name)
+        self._sig = cast(_OQSSignatureImpl, _oqs.Signature(oqs_name))
 
     def keygen(self) -> tuple[bytes, bytes]:
-        pk = cast(bytes, self._sig.generate_keypair())
-        sk = cast(bytes, self._sig.export_secret_key())
+        pk = self._sig.generate_keypair()
+        sk = self._sig.export_secret_key()
         return pk, sk
 
     def sign(self, secret_key: bytes, message: bytes) -> bytes:
-        return cast(bytes, self._sig.sign(message))
+        return self._sig.sign(message)
 
     def verify(self, public_key: bytes, message: bytes, signature: bytes) -> bool:
-        return cast(bool, self._sig.verify(message, signature, public_key))
+        return self._sig.verify(message, signature, public_key)
 
 
 class LibOQSBackend:
