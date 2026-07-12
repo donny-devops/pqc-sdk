@@ -14,20 +14,9 @@ Supported algorithms:
 
 from __future__ import annotations
 
-from typing import TypedDict
-
 from pqc_sdk._backend import get_backend
+from pqc_sdk._types import DSAParams
 from pqc_sdk.exceptions import AlgorithmNotSupportedError, SignatureVerificationError
-
-
-class DSAParams(TypedDict):
-    pk_size: int
-    sk_size: int
-    sig_size: int
-    security_level: int
-    oqs_name: str
-    fips: str
-
 
 _ALIASES: dict[str, str] = {
     "ML-DSA-44": "ML-DSA-44",

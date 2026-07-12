@@ -20,30 +20,14 @@ import hashlib
 import hmac
 import os
 from enum import Enum
-from typing import Protocol, TypedDict, cast
+from typing import Protocol, cast
+
+from pqc_sdk._types import DSAParams, KEMParams
 
 
 class BackendType(Enum):
     LIBOQS = "liboqs"
     SIMULATION = "simulation"
-
-
-class KEMParams(TypedDict):
-    pk_size: int
-    sk_size: int
-    ct_size: int
-    ss_size: int
-    security_level: int
-    oqs_name: str
-
-
-class DSAParams(TypedDict):
-    pk_size: int
-    sk_size: int
-    sig_size: int
-    security_level: int
-    oqs_name: str
-    fips: str
 
 
 class _OQSKEMImpl(Protocol):

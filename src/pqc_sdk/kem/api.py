@@ -13,20 +13,9 @@ Supported algorithms:
 
 from __future__ import annotations
 
-from typing import TypedDict
-
 from pqc_sdk._backend import get_backend
+from pqc_sdk._types import KEMParams
 from pqc_sdk.exceptions import AlgorithmNotSupportedError, PQCError
-
-
-class KEMParams(TypedDict):
-    pk_size: int
-    sk_size: int
-    ct_size: int
-    ss_size: int
-    security_level: int
-    oqs_name: str
-
 
 # Algorithm name normalization map
 _ALIASES: dict[str, str] = {
