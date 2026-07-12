@@ -70,8 +70,8 @@ class HybridKEM:
         # Post-quantum
         pq_pub, pq_sec = self._pq.keygen()
 
-        public_key = x_pub_bytes + pq_pub       # 32 + pk_size
-        secret_key = x_priv_bytes + pq_sec      # 32 + sk_size
+        public_key = x_pub_bytes + pq_pub  # 32 + pk_size
+        secret_key = x_priv_bytes + pq_sec  # 32 + sk_size
         return public_key, secret_key
 
     def encapsulate(self, public_key: bytes) -> tuple[bytes, bytes]:

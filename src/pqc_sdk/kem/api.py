@@ -14,6 +14,7 @@ Supported algorithms:
 from __future__ import annotations
 
 from pqc_sdk._backend import get_backend
+from pqc_sdk._types import KEMParams
 from pqc_sdk.exceptions import AlgorithmNotSupportedError, PQCError
 
 # Algorithm name normalization map
@@ -30,18 +31,30 @@ _ALIASES: dict[str, str] = {
 }
 
 # Key/ciphertext sizes in bytes (FIPS 203 Table 2)
-_PARAMS: dict[str, dict] = {
+_PARAMS: dict[str, KEMParams] = {
     "ML-KEM-512": {
-        "pk_size": 800, "sk_size": 1632, "ct_size": 768, "ss_size": 32,
-        "security_level": 1, "oqs_name": "ML-KEM-512",
+        "pk_size": 800,
+        "sk_size": 1632,
+        "ct_size": 768,
+        "ss_size": 32,
+        "security_level": 1,
+        "oqs_name": "ML-KEM-512",
     },
     "ML-KEM-768": {
-        "pk_size": 1184, "sk_size": 2400, "ct_size": 1088, "ss_size": 32,
-        "security_level": 3, "oqs_name": "ML-KEM-768",
+        "pk_size": 1184,
+        "sk_size": 2400,
+        "ct_size": 1088,
+        "ss_size": 32,
+        "security_level": 3,
+        "oqs_name": "ML-KEM-768",
     },
     "ML-KEM-1024": {
-        "pk_size": 1568, "sk_size": 3168, "ct_size": 1568, "ss_size": 32,
-        "security_level": 5, "oqs_name": "ML-KEM-1024",
+        "pk_size": 1568,
+        "sk_size": 3168,
+        "ct_size": 1568,
+        "ss_size": 32,
+        "security_level": 5,
+        "oqs_name": "ML-KEM-1024",
     },
 }
 
@@ -71,11 +84,10 @@ class KEM:
         canonical = _ALIASES.get(algorithm, algorithm)
         if canonical not in _PARAMS:
             raise AlgorithmNotSupportedError(
-                f"Unsupported KEM algorithm: {algorithm!r}. "
-                f"Supported: {list(_PARAMS.keys())}"
+                f"Unsupported KEM algorithm: {algorithm!r}. " f"Supported: {list(_PARAMS.keys())}"
             )
         self.algorithm = canonical
-        self._params = _PARAMS[canonical]
+        self._params: KEMParams = _PARAMS[canonical]
         self._backend = get_backend()
         self._kem = self._backend.create_kem(self._params["oqs_name"])
 
