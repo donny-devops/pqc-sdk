@@ -14,8 +14,20 @@ Supported algorithms:
 
 from __future__ import annotations
 
+from typing import TypedDict
+
 from pqc_sdk._backend import get_backend
 from pqc_sdk.exceptions import AlgorithmNotSupportedError, SignatureVerificationError
+
+
+class DSAParams(TypedDict):
+    pk_size: int
+    sk_size: int
+    sig_size: int
+    security_level: int
+    oqs_name: str
+    fips: str
+
 
 _ALIASES: dict[str, str] = {
     "ML-DSA-44": "ML-DSA-44",
@@ -34,7 +46,7 @@ _ALIASES: dict[str, str] = {
     "SLH-DSA-SHAKE-256f": "SLH-DSA-SHAKE-256f",
 }
 
-_PARAMS: dict[str, dict] = {
+_PARAMS: dict[str, DSAParams] = {
     "ML-DSA-44": {
         "pk_size": 1312,
         "sk_size": 2528,
@@ -119,7 +131,7 @@ class DSA:
                 f"Unsupported DSA algorithm: {algorithm!r}. " f"Supported: {list(_PARAMS.keys())}"
             )
         self.algorithm = canonical
-        self._params = _PARAMS[canonical]
+        self._params: DSAParams = _PARAMS[canonical]
         self._backend = get_backend()
         self._dsa = self._backend.create_dsa(self._params["oqs_name"])
 

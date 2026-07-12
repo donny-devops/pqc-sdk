@@ -20,11 +20,30 @@ import hashlib
 import hmac
 import os
 from enum import Enum
+from typing import Any, TypedDict, cast
 
 
 class BackendType(Enum):
     LIBOQS = "liboqs"
     SIMULATION = "simulation"
+
+
+class KEMParams(TypedDict):
+    pk_size: int
+    sk_size: int
+    ct_size: int
+    ss_size: int
+    security_level: int
+    oqs_name: str
+
+
+class DSAParams(TypedDict):
+    pk_size: int
+    sk_size: int
+    sig_size: int
+    security_level: int
+    oqs_name: str
+    fips: str
 
 
 # ------------------------------------------------------------------ #
@@ -33,40 +52,40 @@ class BackendType(Enum):
 
 
 class _LibOQSKEM:
-    def __init__(self, oqs_name: str):
+    def __init__(self, oqs_name: str) -> None:
         import oqs as _oqs
 
-        self._kem = _oqs.KeyEncapsulation(oqs_name)
+        self._kem: Any = _oqs.KeyEncapsulation(oqs_name)
 
     def keygen(self) -> tuple[bytes, bytes]:
-        pk = self._kem.generate_keypair()
-        sk = self._kem.export_secret_key()
+        pk = cast(bytes, self._kem.generate_keypair())
+        sk = cast(bytes, self._kem.export_secret_key())
         return pk, sk
 
     def encapsulate(self, public_key: bytes) -> tuple[bytes, bytes]:
-        ct, ss = self._kem.encap_secret(public_key)
+        ct, ss = cast(tuple[bytes, bytes], self._kem.encap_secret(public_key))
         return ct, ss
 
     def decapsulate(self, secret_key: bytes, ciphertext: bytes) -> bytes:
-        return self._kem.decap_secret(ciphertext)
+        return cast(bytes, self._kem.decap_secret(ciphertext))
 
 
 class _LibOQSDSA:
-    def __init__(self, oqs_name: str):
+    def __init__(self, oqs_name: str) -> None:
         import oqs as _oqs
 
-        self._sig = _oqs.Signature(oqs_name)
+        self._sig: Any = _oqs.Signature(oqs_name)
 
     def keygen(self) -> tuple[bytes, bytes]:
-        pk = self._sig.generate_keypair()
-        sk = self._sig.export_secret_key()
+        pk = cast(bytes, self._sig.generate_keypair())
+        sk = cast(bytes, self._sig.export_secret_key())
         return pk, sk
 
     def sign(self, secret_key: bytes, message: bytes) -> bytes:
-        return self._sig.sign(message)
+        return cast(bytes, self._sig.sign(message))
 
     def verify(self, public_key: bytes, message: bytes, signature: bytes) -> bool:
-        return self._sig.verify(message, signature, public_key)
+        return cast(bool, self._sig.verify(message, signature, public_key))
 
 
 class LibOQSBackend:
@@ -93,7 +112,7 @@ class _SimKEM:
     in any security-sensitive context.
     """
 
-    def __init__(self, params: dict):
+    def __init__(self, params: KEMParams) -> None:
         self._pk_size = params["pk_size"]
         self._sk_size = params["sk_size"]
         self._ct_size = params["ct_size"]
@@ -142,7 +161,7 @@ class _SimDSA:
     Dev/test only.
     """
 
-    def __init__(self, params: dict):
+    def __init__(self, params: DSAParams) -> None:
         self._pk_size = params["pk_size"]
         self._sk_size = params["sk_size"]
         self._sig_size = params["sig_size"]
@@ -174,10 +193,10 @@ class SimulationBackend:
     _WARNING_SHOWN = False
 
     # Algorithm name → params lookup (populated lazily)
-    _KEM_PARAMS: dict = {}
-    _DSA_PARAMS: dict = {}
+    _KEM_PARAMS: dict[str, KEMParams] = {}
+    _DSA_PARAMS: dict[str, DSAParams] = {}
 
-    def __init__(self):
+    def __init__(self) -> None:
         if not SimulationBackend._WARNING_SHOWN:
             import warnings
 
@@ -213,10 +232,12 @@ class SimulationBackend:
 # Backend resolver (singleton)                                         #
 # ------------------------------------------------------------------ #
 
-_BACKEND_INSTANCE = None
+Backend = LibOQSBackend | SimulationBackend
+
+_BACKEND_INSTANCE: Backend | None = None
 
 
-def get_backend():
+def get_backend() -> Backend:
     global _BACKEND_INSTANCE
     if _BACKEND_INSTANCE is not None:
         return _BACKEND_INSTANCE

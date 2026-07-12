@@ -13,8 +13,20 @@ Supported algorithms:
 
 from __future__ import annotations
 
+from typing import TypedDict
+
 from pqc_sdk._backend import get_backend
 from pqc_sdk.exceptions import AlgorithmNotSupportedError, PQCError
+
+
+class KEMParams(TypedDict):
+    pk_size: int
+    sk_size: int
+    ct_size: int
+    ss_size: int
+    security_level: int
+    oqs_name: str
+
 
 # Algorithm name normalization map
 _ALIASES: dict[str, str] = {
@@ -30,7 +42,7 @@ _ALIASES: dict[str, str] = {
 }
 
 # Key/ciphertext sizes in bytes (FIPS 203 Table 2)
-_PARAMS: dict[str, dict] = {
+_PARAMS: dict[str, KEMParams] = {
     "ML-KEM-512": {
         "pk_size": 800,
         "sk_size": 1632,
@@ -86,7 +98,7 @@ class KEM:
                 f"Unsupported KEM algorithm: {algorithm!r}. " f"Supported: {list(_PARAMS.keys())}"
             )
         self.algorithm = canonical
-        self._params = _PARAMS[canonical]
+        self._params: KEMParams = _PARAMS[canonical]
         self._backend = get_backend()
         self._kem = self._backend.create_kem(self._params["oqs_name"])
 

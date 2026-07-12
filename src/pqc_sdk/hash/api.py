@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import hashlib
 from enum import Enum
+from typing import Final
 
 
 class HashAlgorithm(Enum):
@@ -23,7 +24,7 @@ class HashAlgorithm(Enum):
     SHA2_512 = "sha512"  # Legacy compat, FIPS 180-4
 
 
-_DEFAULT_OUTPUT_SIZES = {
+_DEFAULT_OUTPUT_SIZES: Final[dict[HashAlgorithm, int]] = {
     HashAlgorithm.SHA3_256: 32,
     HashAlgorithm.SHA3_384: 48,
     HashAlgorithm.SHA3_512: 64,
@@ -60,13 +61,12 @@ def hash_message(
         64
     """
     size = output_size or _DEFAULT_OUTPUT_SIZES[algorithm]
-    name = algorithm.value
 
-    if algorithm in (HashAlgorithm.SHAKE_128, HashAlgorithm.SHAKE_256):
-        h = hashlib.new(name)
-        h.update(message)
-        return h.digest(size)
+    if algorithm == HashAlgorithm.SHAKE_128:
+        return hashlib.shake_128(message).digest(size)
+    if algorithm == HashAlgorithm.SHAKE_256:
+        return hashlib.shake_256(message).digest(size)
 
-    h = hashlib.new(name)
+    h = hashlib.new(algorithm.value)
     h.update(message)
     return h.digest()
