@@ -21,6 +21,7 @@ from pqc_sdk.exceptions import (
 # KEM Tests
 # ─────────────────────────────────────────────
 
+
 class TestKEM:
 
     @pytest.mark.parametrize("algorithm", ["ML-KEM-512", "ML-KEM-768", "ML-KEM-1024"])
@@ -85,6 +86,7 @@ class TestKEM:
 # DSA Tests
 # ─────────────────────────────────────────────
 
+
 class TestDSA:
 
     @pytest.mark.parametrize("algorithm", ["ML-DSA-44", "ML-DSA-65", "ML-DSA-87"])
@@ -142,6 +144,7 @@ class TestDSA:
 # HybridKEM Tests
 # ─────────────────────────────────────────────
 
+
 class TestHybridKEM:
 
     def test_keygen_and_sizes(self):
@@ -186,6 +189,7 @@ class TestHybridKEM:
 # Hash Tests
 # ─────────────────────────────────────────────
 
+
 class TestHash:
 
     def test_sha3_256_length(self):
@@ -217,5 +221,3 @@ class TestHash:
     def test_default_algorithm_is_shake256(self):
         digest = hash_message(b"test")
         assert len(digest) == 32  # SHAKE_256 default output
-
-

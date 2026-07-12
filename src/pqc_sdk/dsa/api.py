@@ -36,32 +36,60 @@ _ALIASES: dict[str, str] = {
 
 _PARAMS: dict[str, dict] = {
     "ML-DSA-44": {
-        "pk_size": 1312, "sk_size": 2528, "sig_size": 2420,
-        "security_level": 2, "oqs_name": "ML-DSA-44", "fips": "FIPS 204",
+        "pk_size": 1312,
+        "sk_size": 2528,
+        "sig_size": 2420,
+        "security_level": 2,
+        "oqs_name": "ML-DSA-44",
+        "fips": "FIPS 204",
     },
     "ML-DSA-65": {
-        "pk_size": 1952, "sk_size": 4000, "sig_size": 3309,
-        "security_level": 3, "oqs_name": "ML-DSA-65", "fips": "FIPS 204",
+        "pk_size": 1952,
+        "sk_size": 4000,
+        "sig_size": 3309,
+        "security_level": 3,
+        "oqs_name": "ML-DSA-65",
+        "fips": "FIPS 204",
     },
     "ML-DSA-87": {
-        "pk_size": 2592, "sk_size": 4864, "sig_size": 4627,
-        "security_level": 5, "oqs_name": "ML-DSA-87", "fips": "FIPS 204",
+        "pk_size": 2592,
+        "sk_size": 4864,
+        "sig_size": 4627,
+        "security_level": 5,
+        "oqs_name": "ML-DSA-87",
+        "fips": "FIPS 204",
     },
     "SLH-DSA-SHAKE-128s": {
-        "pk_size": 32, "sk_size": 64, "sig_size": 7856,
-        "security_level": 1, "oqs_name": "SPHINCS+-SHAKE-128s-simple", "fips": "FIPS 205",
+        "pk_size": 32,
+        "sk_size": 64,
+        "sig_size": 7856,
+        "security_level": 1,
+        "oqs_name": "SPHINCS+-SHAKE-128s-simple",
+        "fips": "FIPS 205",
     },
     "SLH-DSA-SHAKE-128f": {
-        "pk_size": 32, "sk_size": 64, "sig_size": 17088,
-        "security_level": 1, "oqs_name": "SPHINCS+-SHAKE-128f-simple", "fips": "FIPS 205",
+        "pk_size": 32,
+        "sk_size": 64,
+        "sig_size": 17088,
+        "security_level": 1,
+        "oqs_name": "SPHINCS+-SHAKE-128f-simple",
+        "fips": "FIPS 205",
     },
     "SLH-DSA-SHAKE-256s": {
-        "pk_size": 64, "sk_size": 128, "sig_size": 29792,
-        "security_level": 5, "oqs_name": "SPHINCS+-SHAKE-256s-simple", "fips": "FIPS 205",
+        "pk_size": 64,
+        "sk_size": 128,
+        "sig_size": 29792,
+        "security_level": 5,
+        "oqs_name": "SPHINCS+-SHAKE-256s-simple",
+        "fips": "FIPS 205",
     },
     "SLH-DSA-SHAKE-256f": {
-        "pk_size": 64, "sk_size": 128, "sig_size": 49856,
-        "security_level": 5, "oqs_name": "SPHINCS+-SHAKE-256f-simple", "fips": "FIPS 205",
+        "pk_size": 64,
+        "sk_size": 128,
+        "sig_size": 49856,
+        "security_level": 5,
+        "oqs_name": "SPHINCS+-SHAKE-256f-simple",
+        "fips": "FIPS 205",
     },
 }
 
@@ -88,8 +116,7 @@ class DSA:
         canonical = _ALIASES.get(algorithm, algorithm)
         if canonical not in _PARAMS:
             raise AlgorithmNotSupportedError(
-                f"Unsupported DSA algorithm: {algorithm!r}. "
-                f"Supported: {list(_PARAMS.keys())}"
+                f"Unsupported DSA algorithm: {algorithm!r}. " f"Supported: {list(_PARAMS.keys())}"
             )
         self.algorithm = canonical
         self._params = _PARAMS[canonical]
@@ -139,9 +166,7 @@ class DSA:
         """
         result = self._dsa.verify(public_key, message, signature)
         if not result:
-            raise SignatureVerificationError(
-                f"Signature verification failed for {self.algorithm}"
-            )
+            raise SignatureVerificationError(f"Signature verification failed for {self.algorithm}")
         return True
 
     # ------------------------------------------------------------------ #
