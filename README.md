@@ -1,14 +1,45 @@
-# pqc-sdk
+# 🔐 PQC SDK
 
-**Post-Quantum Cryptography SDK for Python** — drop-in ML-KEM, ML-DSA, and SLH-DSA primitives aligned with NIST FIPS 203, 204, and 205.
+[![CI](https://github.com/donny-devops/pqc-sdk/actions/workflows/ci.yml/badge.svg)](https://github.com/donny-devops/pqc-sdk/actions)
+[![Coverage](https://img.shields.io/codecov/c/github/donny-devops/pqc-sdk?style=flat-square)](https://codecov.io/gh/donny-devops/pqc-sdk)
+[![Version](https://img.shields.io/github/v/release/donny-devops/pqc-sdk?style=flat-square)](https://github.com/donny-devops/pqc-sdk/releases)
+[![License](https://img.shields.io/github/license/donny-devops/pqc-sdk?style=flat-square)](LICENSE)
 
-[![CI](https://github.com/donny-devops/post-quantum-studio/actions/workflows/ci.yml/badge.svg)](https://github.com/donny-devops/post-quantum-studio/actions/workflows/ci.yml)
-[![PyPI version](https://badge.fury.io/py/pqc-sdk.svg)](https://pypi.org/project/pqc-sdk/)
-[![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-[![FIPS 203](https://img.shields.io/badge/FIPS-203-orange.svg)](https://csrc.nist.gov/pubs/fips/203/final)
-[![FIPS 204](https://img.shields.io/badge/FIPS-204-orange.svg)](https://csrc.nist.gov/pubs/fips/204/final)
-[![FIPS 205](https://img.shields.io/badge/FIPS-205-orange.svg)](https://csrc.nist.gov/pubs/fips/205/final)
+> Developer-first SDK & CLI library providing type-safe implementations of NIST Post-Quantum Cryptographic algorithms and hybrid cryptographic handshakes.
+
+---
+
+## 🏛️ Architecture
+
+```mermaid
+flowchart TD
+    ClientApp[Client Application] --> PQCSDK[PQC SDK Facade]
+    subgraph CorePrimitives [NIST Core Primitives]
+        PQCSDK --> KEM[ML-KEM Engine: Key Encapsulation]
+        PQCSDK --> DSA[ML-DSA & SLH-DSA: Digital Signatures]
+        PQCSDK --> Hybrid[Hybrid KEM: X25519 + ML-KEM-768]
+    end
+    subgraph Encoders [Serialization & Key Formats]
+        KEM & DSA & Hybrid --> DER[ASN.1 / DER Encoders]
+        KEM & DSA & Hybrid --> RAW[Raw Byte Vector Format]
+    end
+```
+
+---
+
+## ⚡ Quickstart
+
+```bash
+# 1. Install SDK
+npm install @donny-devops/pqc-sdk
+# or: pip install donny-pqc-sdk
+
+# 2. Initialize in your code
+# (See examples/hybrid-exchange.ts)
+
+# 3. Run Verification Suite
+npx pqc-cli verify --standard fips-203
+```
 
 ---
 
