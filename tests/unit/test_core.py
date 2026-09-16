@@ -17,9 +17,9 @@ from pqc_sdk.exceptions import (
     PQCError,
 )
 
-# ─────────────────────────────────────────────
+# ─────────────────────────────────────────
 # KEM Tests
-# ─────────────────────────────────────────────
+# ─────────────────────────────────────────
 
 
 class TestKEM:
@@ -37,11 +37,18 @@ class TestKEM:
         pk, sk = kem.keygen()
         ct, ss1 = kem.encapsulate(pk)
         ss2 = kem.decapsulate(sk, ct)
-        # Note: simulation backend uses approximate key recovery;
-        # liboqs backend produces exact match
         assert len(ss1) == 32
         assert len(ss2) == 32
         assert len(ct) == kem.ciphertext_size
+        assert ss1 == ss2
+
+    def test_encap_decap_roundtrip_across_instances(self):
+        sender = KEM("ML-KEM-768")
+        recipient = KEM("ML-KEM-768")
+        pk, sk = recipient.keygen()
+        ct, ss1 = sender.encapsulate(pk)
+        ss2 = recipient.decapsulate(sk, ct)
+        assert ss1 == ss2
 
     def test_alias_kyber768(self):
         kem = KEM("Kyber768")
@@ -82,9 +89,9 @@ class TestKEM:
         assert pk1 != pk2, "Two keygens should produce different keys"
 
 
-# ─────────────────────────────────────────────
+# ─────────────────────────────────────────
 # DSA Tests
-# ─────────────────────────────────────────────
+# ─────────────────────────────────────────
 
 
 class TestDSA:
@@ -139,10 +146,34 @@ class TestDSA:
         sig = dsa.sign(sk, large_msg)
         assert dsa.verify(pk, large_msg, sig)
 
+    def test_verify_rejects_tampered_message(self):
+        from pqc_sdk.exceptions import SignatureVerificationError
 
-# ─────────────────────────────────────────────
+        dsa = DSA("ML-DSA-65")
+        pk, sk = dsa.keygen()
+        sig = dsa.sign(sk, b"pay alice $1")
+        with pytest.raises(SignatureVerificationError):
+            dsa.verify(pk, b"pay bob $1000000", sig)
+
+    def test_verify_rejects_random_signature(self):
+        from pqc_sdk.exceptions import SignatureVerificationError
+
+        dsa = DSA("ML-DSA-65")
+        pk, sk = dsa.keygen()
+        with pytest.raises(SignatureVerificationError):
+            dsa.verify(pk, b"hello", os.urandom(dsa.signature_size))
+
+    def test_sign_verify_across_instances(self):
+        issuer = DSA("ML-DSA-65")
+        verifier = DSA("ML-DSA-65")
+        pk, sk = issuer.keygen()
+        sig = issuer.sign(sk, b"hello pqc world")
+        assert verifier.verify(pk, b"hello pqc world", sig)
+
+
+# ─────────────────────────────────────────
 # HybridKEM Tests
-# ─────────────────────────────────────────────
+# ─────────────────────────────────────────
 
 
 class TestHybridKEM:
@@ -185,9 +216,9 @@ class TestHybridKEM:
         assert ss_wrong != ss_correct, "Wrong key should produce different shared secret"
 
 
-# ─────────────────────────────────────────────
+# ─────────────────────────────────────────
 # Hash Tests
-# ─────────────────────────────────────────────
+# ─────────────────────────────────────────
 
 
 class TestHash:
