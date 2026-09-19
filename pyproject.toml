@@ -37,7 +37,7 @@ native = [
     "liboqs-python>=0.10.0",  # enables liboqs backend (recommended for production)
 ]
 dev = [
-    "pytest>=8.0",
+    "pytest>=9.1.1",
     "pytest-benchmark>=4.0",
     "ruff>=0.4",
     "black>=24.0",
