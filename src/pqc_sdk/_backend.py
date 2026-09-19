@@ -53,6 +53,7 @@ class _LibOQSKEM:
     def __init__(self, oqs_name: str) -> None:
         import oqs as _oqs
 
+        self._oqs_name = oqs_name
         self._kem = cast(_OQSKEMImpl, _oqs.KeyEncapsulation(oqs_name))
 
     def keygen(self) -> tuple[bytes, bytes]:
@@ -65,13 +66,19 @@ class _LibOQSKEM:
         return ct, ss
 
     def decapsulate(self, secret_key: bytes, ciphertext: bytes) -> bytes:
-        return self._kem.decap_secret(ciphertext)
+        # liboqs KeyEncapsulation is stateful; load the caller-supplied
+        # secret key instead of whatever this instance last generated.
+        import oqs as _oqs
+
+        kem = cast(_OQSKEMImpl, _oqs.KeyEncapsulation(self._oqs_name, secret_key))
+        return kem.decap_secret(ciphertext)
 
 
 class _LibOQSDSA:
     def __init__(self, oqs_name: str) -> None:
         import oqs as _oqs
 
+        self._oqs_name = oqs_name
         self._sig = cast(_OQSSignatureImpl, _oqs.Signature(oqs_name))
 
     def keygen(self) -> tuple[bytes, bytes]:
@@ -80,7 +87,10 @@ class _LibOQSDSA:
         return pk, sk
 
     def sign(self, secret_key: bytes, message: bytes) -> bytes:
-        return self._sig.sign(message)
+        import oqs as _oqs
+
+        sig = cast(_OQSSignatureImpl, _oqs.Signature(self._oqs_name, secret_key))
+        return sig.sign(message)
 
     def verify(self, public_key: bytes, message: bytes, signature: bytes) -> bool:
         return self._sig.verify(message, signature, public_key)
@@ -139,16 +149,9 @@ class _SimKEM:
 
     def decapsulate(self, secret_key: bytes, ciphertext: bytes) -> bytes:
         r = ciphertext[:32]
-        # Recover public key from secret key (first 32 bytes are seed,
-        # next 32 are pk[:32] embedded at keygen)
-        secret_key[32:64]
-        # Reconstruct shared secret using the same derivation
-        # Real ML-KEM uses the full pk; we approximate with the fragment
-        full_pk_approx = hashlib.shake_256(b"pk" + secret_key[:64]).digest(
-            1184  # ML-KEM-768 pk size as approximation
-        )
-        shared_secret = hashlib.shake_256(b"ss" + r + full_pk_approx).digest(self._ss_size)
-        return shared_secret
+        # keygen stores seed in secret_key[:64]; pk = shake("pk" + seed)
+        recovered_pk = hashlib.shake_256(b"pk" + secret_key[:64]).digest(self._pk_size)
+        return hashlib.shake_256(b"ss" + r + recovered_pk).digest(self._ss_size)
 
 
 class _SimDSA:
@@ -173,15 +176,16 @@ class _SimDSA:
         return pk, sk
 
     def sign(self, secret_key: bytes, message: bytes) -> bytes:
-        mac = hmac.new(secret_key[:32], message, hashlib.sha3_512).digest()
-        sig = hashlib.shake_256(b"sig" + mac + message).digest(self._sig_size)
-        return sig
+        # Bind the tag to the public key derived from this secret and to the
+        # message so tampers and random signatures fail verify().
+        expected_pk = hashlib.shake_256(b"pk" + secret_key[:32]).digest(self._pk_size)
+        return hashlib.shake_256(b"sim-dsa-v1" + expected_pk + message).digest(self._sig_size)
 
     def verify(self, public_key: bytes, message: bytes, signature: bytes) -> bool:
         if len(signature) != self._sig_size:
             return False
-        # Structural check: verify signature length and non-null
-        return len(signature) == self._sig_size and any(signature)
+        expected = hashlib.shake_256(b"sim-dsa-v1" + public_key + message).digest(self._sig_size)
+        return hmac.compare_digest(signature, expected)
 
 
 class SimulationBackend:
